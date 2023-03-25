@@ -1,5 +1,6 @@
 #include <Bounce2.h>
 #include <Encoder.h>
+#include "Keyboard.h"
 
 // Zynthian implements midi UI control using a configurable Master Channel
 // UI actions are bound to midi notes, which can be set in the webconf
@@ -15,10 +16,24 @@ pins should be added to the array in the same order as the CUIA button index.
 for Zynthian v4 panels, pin index 0-3 are the encoder switches and 4-7 are the extra four.
 */
 // pin for index:            0   1   2   3   4   5   6   7
-const byte buttonPins[] = { 23, 22, 21, 20, 19, 18, 17, 16 };
+//const byte buttonPins[] = { 23, 22, 21, 20, 19, 18, 17, 16 };
+
+// wyleu yellow/white box 
+const byte buttonPins[] = { 2, 5, 9, 10, 13, 12, 20, 21 };
+
+// Keys in order for encoder buttons then s1-s4 buttons
+const byte buttonKeycodes[] = {'i','k','o','l','z','x','c','v'};
+
+// Modifiers to identify encoder 
+const byte buttonModifiers[] = {KEY_LEFT_SHIFT, KEY_LEFT_CTRL};
+
+// keys for up and down
+const byte encoderKeys[] = {',','.'};
+
+
 // count pins specified and initialize array of Bounce objects
 const byte buttonCnt = sizeof(buttonPins);
-Bounce button[buttonCnt] = Bounce(); 
+Bounce button[buttonCnt] = { Bounce()}; 
 
 // Rotary Encoders
 /*
@@ -46,11 +61,20 @@ It is theoretically possible for this code to retrieve the specific binds from
 the zynthian using , but now that my thing works I probably won't put in the time. 
 */
 int firstEncoderCuiaIndex = 16;
-Encoder zynpots[4] = {
-Encoder(2,3),   // pins for encoder 0
-Encoder(4,5),   // pins for encoder 1
-Encoder(8,9),   // pins for encoder 2
-Encoder(6,7),   // pins for encoder 3
+
+
+//Encoder zynpots[4] = {
+//Encoder(2,3),   // pins for encoder 0
+//Encoder(4,5),   // pins for encoder 1
+//Encoder(8,9),   // pins for encoder 2
+//Encoder(6,7),   // pins for encoder 3
+//};
+
+Encoder zynpots[4] = {     // wyleu yellow/white box
+Encoder(1,0),   // pins for encoder 0  Chain
+Encoder(3,4),   // pins for encoder 1  Back
+Encoder(11,6),  // pins for encoder 2  Learn/Snaphot
+Encoder(7,8),   // pins for encoder 3  Select
 };
 
 // Basically, if you setup your Zynthian's CUIA binds as described in the readme,
@@ -80,13 +104,17 @@ void loop() {
   for ( byte i = 0; i < buttonCnt; i++ ) {
     if (button[i].changed()) {
       int debVal = button[i].read();
-      Serial.print("Button "); Serial.print(i); Serial.print(", sending note "); Serial.print(i+90);
+      Serial.print("Button "); Serial.print(i); 
       if (debVal == 0) {
-        usbMIDI.sendNoteOn(i+90, 64, masterChannel);
+        // usbMIDI.sendNoteOn(i+90, 64, masterChannel);
+        // Serial.print(", sending note "); Serial.print(i+90);
+        Keyboard.press(buttonKeycodes[i]);
+        Serial.print(", sending key "); Serial.print(buttonKeycodes[i]); 
         Serial.println(" on.");
       } else {
-        usbMIDI.sendNoteOff(i+90, 0, masterChannel);
-        Serial.println(" off.");
+        // usbMIDI.sendNoteOff(i+90, 0, masterChannel);    
+        Keyboard.release(buttonKeycodes[i]);
+        Serial.println(" off.");        
       }
     }    
   }
@@ -96,16 +124,27 @@ void loop() {
     currentCoderValue[i] = zynpots[i].read();
     if (currentCoderValue[i] >= 4) {
       Serial.print("Encoder "); Serial.print(i); Serial.println(" up"); 
-      usbMIDI.sendNoteOn(i*2 + 16, 64, masterChannel);
+      // usbMIDI.sendNoteOn(i*2 + 16, 64, masterChannel);
+      if( i < 2){
+        Keyboard.press(buttonModifiers[1]);
+      }
+      if(i == 0 or i == 2){
+        Keyboard.press(buttonModifiers[0]);
+      }
+      Keyboard.press(encoderKeys[0]);
+      
+      Keyboard.releaseAll();
       zynpots[i].write(0);
     } else if (currentCoderValue[i] <= -4) {
       Serial.print("Encoder "); Serial.print(i); Serial.println(" down"); 
-      usbMIDI.sendNoteOn(i*2 + 17, 64, masterChannel);
+      //usbMIDI.sendNoteOn(i*2 + 17, 64, masterChannel);
+      Keyboard.press(encoderKeys[1]);
+      Keyboard.releaseAll();
       zynpots[i].write(0);
     } 
   }
 
   // MIDI Controllers should discard incoming MIDI messages.
-  while (usbMIDI.read()) {
-  }
+  //while (usbMIDI.read()) {
+  //}
 }
