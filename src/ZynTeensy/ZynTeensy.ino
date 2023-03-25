@@ -83,6 +83,7 @@ int currentCoderValue[4] = {0};
 
 void setup() {
   Serial.begin(9600);
+  Keyboard.begin();
 
   for (byte i = 0; i < 4; i++) {
     zynpots[i].write(0);
@@ -137,7 +138,7 @@ void loop() {
           Keyboard.press(KEY_LEFT_SHIFT);
       }
       
-      Keyboard.press(encoderKeys[0]); 
+      Keyboard.press('.'); 
       Keyboard.releaseAll();
       zynpots[i].write(0);
 
@@ -155,7 +156,7 @@ void loop() {
         Keyboard.press(KEY_LEFT_SHIFT);
       }
       
-      Keyboard.press(encoderKeys[1]);
+      Keyboard.press(',');
       Keyboard.releaseAll();
       zynpots[i].write(0);
     }   
