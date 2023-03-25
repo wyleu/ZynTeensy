@@ -71,10 +71,10 @@ int firstEncoderCuiaIndex = 16;
 //};
 
 Encoder zynpots[4] = {     // wyleu yellow/white box
-Encoder(1,0),   // pins for encoder 0  Chain
+Encoder(0,1),   // pins for encoder 0  Chain
 Encoder(3,4),   // pins for encoder 1  Back
 Encoder(11,6),  // pins for encoder 2  Learn/Snaphot
-Encoder(7,8),   // pins for encoder 3  Select
+Encoder(8,7),   // pins for encoder 3  Select
 };
 
 // Basically, if you setup your Zynthian's CUIA binds as described in the readme,
@@ -122,26 +122,43 @@ void loop() {
   // zynpots
   for ( byte i = 0; i < 4; i++ ) {
     currentCoderValue[i] = zynpots[i].read();
+
     if (currentCoderValue[i] >= 4) {
       Serial.print("Encoder "); Serial.print(i); Serial.println(" up"); 
       // usbMIDI.sendNoteOn(i*2 + 16, 64, masterChannel);
-      if( i < 2){
-        Keyboard.press(buttonModifiers[1]);
+      if( i == 0 ){
+         Keyboard.press(KEY_LEFT_SHIFT);
+         Keyboard.press(KEY_LEFT_CTRL);
       }
-      if(i == 0 or i == 2){
-        Keyboard.press(buttonModifiers[0]);
+      if(i == 1){
+         Keyboard.press(KEY_LEFT_CTRL);
       }
-      Keyboard.press(encoderKeys[0]);
+      if(i == 2){
+          Keyboard.press(KEY_LEFT_SHIFT);
+      }
       
+      Keyboard.press(encoderKeys[0]); 
       Keyboard.releaseAll();
       zynpots[i].write(0);
+
     } else if (currentCoderValue[i] <= -4) {
       Serial.print("Encoder "); Serial.print(i); Serial.println(" down"); 
       //usbMIDI.sendNoteOn(i*2 + 17, 64, masterChannel);
+      if( i == 0 ){
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.press(KEY_LEFT_CTRL);
+      }
+      if(i == 1){
+        Keyboard.press(KEY_LEFT_CTRL);
+      }
+      if(i == 2){
+        Keyboard.press(KEY_LEFT_SHIFT);
+      }
+      
       Keyboard.press(encoderKeys[1]);
       Keyboard.releaseAll();
       zynpots[i].write(0);
-    } 
+    }   
   }
 
   // MIDI Controllers should discard incoming MIDI messages.
