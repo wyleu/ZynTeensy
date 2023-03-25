@@ -1,2 +1,2 @@
 # ZynTeensy
-A Teensy-based midi controller that implements the standard Zynthian v4 controls.
+A MKRZero-based HID QWERTY keyboard based controller that implements the standard Zynthian v4 controls for Greenheart.
