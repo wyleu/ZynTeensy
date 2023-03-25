@@ -72,8 +72,8 @@ int firstEncoderCuiaIndex = 16;
 
 Encoder zynpots[4] = {     // wyleu yellow/white box
 Encoder(0,1),   // pins for encoder 0  Chain
-Encoder(3,4),   // pins for encoder 1  Back
-Encoder(11,6),  // pins for encoder 2  Learn/Snaphot
+Encoder(4,3),   // pins for encoder 1  Back
+Encoder(6,11),  // pins for encoder 2  Learn/Snaphot
 Encoder(8,7),   // pins for encoder 3  Select
 };
 
