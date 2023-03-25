@@ -2,6 +2,9 @@
 #include <Encoder.h>
 #include "Keyboard.h"
 
+
+//   Messy but working with keyboard.h
+//
 // Zynthian implements midi UI control using a configurable Master Channel
 // UI actions are bound to midi notes, which can be set in the webconf
 // I might experiment with porting this to using OSC, but that would be later.
